@@ -8,7 +8,6 @@ public class CProgressApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(CProgressApplication.class, args);
-		System.out.println("DATABASE_USERNAME: " + System.getenv("DATABASE_USERNAME"));
 	}
 
 }
