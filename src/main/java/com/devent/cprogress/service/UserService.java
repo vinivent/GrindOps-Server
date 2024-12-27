@@ -57,8 +57,7 @@ public class UserService {
 
     // Obter conquistas de um usuário pelo username
     public List<Achievement> getAchievementsByUsername(String username) {
-        UserDetails userDetails = userRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com username: " + username));
+        UserDetails userDetails = userRepository.findByUsername(username);
 
         if (!(userDetails instanceof User user)) {
             throw new IllegalStateException("O objeto retornado não é do tipo User");
@@ -68,8 +67,7 @@ public class UserService {
     }
 
     public List<Camouflage> getCamouflagesByUsername(String username) {
-        UserDetails userDetails = userRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com username: " + username));
+        UserDetails userDetails = userRepository.findByUsername(username);
 
         if (!(userDetails instanceof User user)) {
             throw new IllegalStateException("O objeto retornado não é do tipo User");
