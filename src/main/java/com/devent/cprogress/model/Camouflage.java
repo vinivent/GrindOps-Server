@@ -1,10 +1,10 @@
 package com.devent.cprogress.model;
 
+import com.devent.cprogress.model.User.User;
 import jakarta.persistence.*;
 
 @Entity
 public class Camouflage {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -15,13 +15,16 @@ public class Camouflage {
     @Column(nullable = false)
     private String description;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CategoryType category;
+
     @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     private boolean achieved;
 
-    // Getters and setters
     public Long getId() {
         return id;
     }
@@ -46,12 +49,20 @@ public class Camouflage {
         this.description = description;
     }
 
-    public Category getCategory() {
+    public CategoryType getCategory() {
         return category;
     }
 
-    public void setCategory(Category category) {
+    public void setCategory(CategoryType category) {
         this.category = category;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public boolean isAchieved() {

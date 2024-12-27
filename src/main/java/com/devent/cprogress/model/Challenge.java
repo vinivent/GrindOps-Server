@@ -1,6 +1,7 @@
 package com.devent.cprogress.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class Challenge {
@@ -9,10 +10,12 @@ public class Challenge {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "Desafio e obrigatorio")
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ChallengeType challengeType;
 
+    @NotNull(message = "Categoria e obrigatorio")
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
@@ -27,7 +30,7 @@ public class Challenge {
         this.id = id;
     }
 
-    public ChallengeType getType() {
+    public ChallengeType getChallengeType() {
         return challengeType;
     }
 

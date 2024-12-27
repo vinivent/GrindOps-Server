@@ -1,6 +1,7 @@
 package com.devent.cprogress.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class Category {
@@ -9,8 +10,9 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "Categoria e obrigatorio")
     @Column(nullable = false, unique = true)
-    @Enumerated(EnumType.STRING) // Converte o valor da enum para string ao persistir no banco de dados
+    @Enumerated(EnumType.STRING)
     private CategoryType type;
 
     public Long getId() {

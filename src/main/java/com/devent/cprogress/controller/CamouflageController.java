@@ -1,6 +1,7 @@
 package com.devent.cprogress.controller;
 
 import com.devent.cprogress.model.Camouflage;
+import com.devent.cprogress.model.CategoryType;
 import com.devent.cprogress.service.CamouflageService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,5 +63,18 @@ public class CamouflageController {
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/category/{category}")
+    public ResponseEntity<List<Camouflage>> getCamouflagesByCategory(@PathVariable CategoryType category) {
+        List<Camouflage> camouflages = camouflageService.getCamouflagesByCategory(category);
+        return ResponseEntity.ok(camouflages);
+    }
+
+    @GetMapping("/category/{category}/achieved")
+    public ResponseEntity<List<Camouflage>> getCamouflagesByCategory(@PathVariable CategoryType category,
+                                                                     @RequestParam boolean achieved) {
+        List<Camouflage> camouflages = camouflageService.getCamouflagesByCategoryAndAchieved(category, achieved);
+        return ResponseEntity.ok(camouflages);
     }
 }

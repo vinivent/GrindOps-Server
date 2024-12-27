@@ -1,6 +1,8 @@
 package com.devent.cprogress.controller;
 
+import com.devent.cprogress.model.CategoryType;
 import com.devent.cprogress.model.Challenge;
+import com.devent.cprogress.model.ChallengeType;
 import com.devent.cprogress.service.ChallengeService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,5 +64,26 @@ public class ChallengeController {
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/type/{challengeType}")
+    public ResponseEntity<List<Challenge>> getChallengesByType(@PathVariable ChallengeType challengeType) {
+        List<Challenge> challenges = challengeService.getChallengesByType(challengeType);
+        return ResponseEntity.ok(challenges);
+    }
+
+    @GetMapping("/category/{categoryType}")
+    public ResponseEntity<List<Challenge>> getChallengesByCategoryType(@PathVariable CategoryType categoryType) {
+        List<Challenge> challenges = challengeService.getChallengesByCategoryType(categoryType);
+        return ResponseEntity.ok(challenges);
+    }
+
+    @GetMapping("/type/{challengeType}/category/{categoryType}")
+    public ResponseEntity<List<Challenge>> getChallengesByTypeAndCategory(
+            @PathVariable ChallengeType challengeType,
+            @PathVariable CategoryType categoryType
+    ) {
+        List<Challenge> challenges = challengeService.getChallengesByTypeAndCategory(challengeType, categoryType);
+        return ResponseEntity.ok(challenges);
     }
 }

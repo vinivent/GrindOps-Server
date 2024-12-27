@@ -1,6 +1,8 @@
 package com.devent.cprogress.controller;
 
-import com.devent.cprogress.model.User;
+import com.devent.cprogress.model.Achievement;
+import com.devent.cprogress.model.Camouflage;
+import com.devent.cprogress.model.User.User;
 import com.devent.cprogress.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +21,6 @@ public class UserController {
     @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
-    }
-
-    @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        User createdUser = userService.createUser(user);
-        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -59,6 +55,26 @@ public class UserController {
         try {
             userService.deleteUser(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/{username}/achievements")
+    public ResponseEntity<List<Achievement>> getAchievementsByUsername(@PathVariable String username) {
+        try {
+            List<Achievement> achievements = userService.getAchievementsByUsername(username);
+            return new ResponseEntity<>(achievements, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/{username}/camouflages")
+    public ResponseEntity<List<Camouflage>> getCamouflagesByUsername(@PathVariable String username) {
+        try {
+            List<Camouflage> camouflages = userService.getCamouflagesByUsername(username);
+            return new ResponseEntity<>(camouflages, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }

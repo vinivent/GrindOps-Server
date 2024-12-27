@@ -1,5 +1,6 @@
 package com.devent.cprogress.model;
 
+import com.devent.cprogress.model.User.User;
 import jakarta.persistence.*;
 
 @Entity
@@ -22,6 +23,10 @@ public class Achievement {
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     private boolean achieved;
 
@@ -71,5 +76,13 @@ public class Achievement {
 
     public void setAchieved(boolean achieved) {
         this.achieved = achieved;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
