@@ -3,6 +3,7 @@ package com.devent.cprogress.controller;
 import com.devent.cprogress.model.Achievement;
 import com.devent.cprogress.model.Camouflage;
 import com.devent.cprogress.model.User.User;
+import com.devent.cprogress.service.TokenService;
 import com.devent.cprogress.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +14,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin("*")
 @RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
+
+    @Autowired
+    TokenService tokenService;
 
     @Autowired
     public UserController(UserService userService) {
@@ -27,6 +32,18 @@ public class UserController {
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> users = userService.getAllUsers();
         return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<User> getAuthenticatedUser(@RequestHeader("Authorization") String token) {
+        try {
+            String jwtToken = token.replace("Bearer ", "");
+            String username = tokenService.validateToken(jwtToken);
+            User user = userService.getUserByUsername(username);
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @GetMapping("/{id}")
