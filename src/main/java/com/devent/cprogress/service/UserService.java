@@ -55,6 +55,11 @@ public class UserService {
 
     // Métodos adicionais
 
+    public User getUserByUsername(String username) {
+        return userRepository.findUserByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+    }
+
     // Obter conquistas de um usuário pelo username
     public List<Achievement> getAchievementsByUsername(String username) {
         UserDetails userDetails = userRepository.findByUsername(username);
