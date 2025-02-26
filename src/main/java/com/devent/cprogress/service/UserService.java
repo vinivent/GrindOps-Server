@@ -2,6 +2,7 @@ package com.devent.cprogress.service;
 
 import com.devent.cprogress.model.Achievement;
 import com.devent.cprogress.model.Camouflage;
+import com.devent.cprogress.model.User.UpdateUserDTO;
 import com.devent.cprogress.model.User.User;
 import com.devent.cprogress.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -33,18 +34,36 @@ public class UserService {
                 orElseThrow(() -> new EntityNotFoundException("Usário não encontrado com o ID: " + id));
     }
 
-    public User updateUser(User user) {
-        User existingUser = userRepository.findById(user.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com ID " + user.getId()));
+    public User updateUser(Long id, UpdateUserDTO updateUserDTO) {
+        // Busca o usuário existente
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com ID " + id));
 
-        if (!existingUser.getPassword().equals(user.getPassword())) {
-            String encodedPassword = passwordEncoder.encode(user.getPassword());
-            user.setPassword(encodedPassword);
+        // Atualiza o username (se fornecido e diferente do atual)
+        if (updateUserDTO.username() != null && !updateUserDTO.username().equals(existingUser.getUsername())) {
+            // Verifica se o novo username já está em uso
+            boolean usernameExists = userRepository.findUserByUsername(updateUserDTO.username()).isPresent();
+            if (usernameExists) {
+                throw new IllegalArgumentException("O nome de usuário já está em uso.");
+            }
+            existingUser.setUsername(updateUserDTO.username());
         }
 
-        return userRepository.save(user);
+        // Atualiza a senha (se fornecida)
+        if (updateUserDTO.password() != null && !updateUserDTO.password().isEmpty()) {
+            String encodedPassword = passwordEncoder.encode(updateUserDTO.password());
+            existingUser.setPassword(encodedPassword);
+        }
 
+        // Atualiza o email (se fornecido)
+        if (updateUserDTO.email() != null) {
+            existingUser.setEmail(updateUserDTO.email());
+        }
+
+        // Salva as alterações no banco de dados
+        return userRepository.save(existingUser);
     }
+
     public void deleteUser(Long id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
@@ -54,6 +73,12 @@ public class UserService {
     }
 
     // Métodos adicionais
+    public boolean isPasswordValid (String password, Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com ID " + id));
+
+        return passwordEncoder.matches(password, user.getPassword());
+    }
 
     public User getUserByUsername(String username) {
         return userRepository.findUserByUsername(username)

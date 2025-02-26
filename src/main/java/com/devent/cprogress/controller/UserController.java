@@ -2,6 +2,8 @@ package com.devent.cprogress.controller;
 
 import com.devent.cprogress.model.Achievement;
 import com.devent.cprogress.model.Camouflage;
+import com.devent.cprogress.model.User.PasswordRequest;
+import com.devent.cprogress.model.User.UpdateUserDTO;
 import com.devent.cprogress.model.User.User;
 import com.devent.cprogress.service.TokenService;
 import com.devent.cprogress.service.UserService;
@@ -14,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin("*")
 @RequestMapping("/api/users")
 public class UserController {
 
@@ -46,6 +47,17 @@ public class UserController {
         }
     }
 
+    @PostMapping("/checkPassword")
+    public ResponseEntity<Boolean> checkPassword(@RequestBody PasswordRequest request) {
+        try {
+            boolean isValid = userService.isPasswordValid(request.password(), request.id());
+            return ResponseEntity.ok(isValid);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
+        }
+    }
+
+
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         try {
@@ -57,13 +69,14 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
-        user.setId(id);
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody UpdateUserDTO updateUserDTO ) {
         try {
-            User updatedUser = userService.updateUser(user);
+            User updatedUser = userService.updateUser(id, updateUserDTO);
             return new ResponseEntity<>(updatedUser, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
     }
 
