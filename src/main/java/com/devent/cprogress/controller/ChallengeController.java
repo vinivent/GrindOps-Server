@@ -13,11 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin("*")
 @RequestMapping("/api/challenges")
 public class ChallengeController {
 
-    private final ChallengeService challengeService;
+    private ChallengeService challengeService;
 
     @Autowired
     public ChallengeController(ChallengeService challengeService) {

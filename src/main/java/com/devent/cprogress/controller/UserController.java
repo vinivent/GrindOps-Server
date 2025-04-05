@@ -46,22 +46,6 @@ public class UserController {
         }
     }
 
-    @PostMapping("/me/camouflages/{id}/mark")
-    public ResponseEntity<?> markCamouflage(@PathVariable Long id, @RequestHeader("Authorization") String token) {
-        String username = tokenService.validateToken(token.replace("Bearer ", ""));
-        userService.markCamouflageAsAchieved(username, id);
-        return ResponseEntity.ok().build();
-    }
-
-
-    @DeleteMapping("/me/camouflages/{id}/unmark")
-    public ResponseEntity<?> unmarkCamouflage(@PathVariable Long id, @RequestHeader("Authorization") String token) {
-        String username = tokenService.validateToken(token.replace("Bearer ", ""));
-        userService.unmarkCamouflage(username, id);
-        return ResponseEntity.ok().build();
-    }
-
-
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         try {
@@ -110,6 +94,28 @@ public class UserController {
             return new ResponseEntity<>(camouflages, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping("/me/camouflages/{id}/mark")
+    public ResponseEntity<?> markCamouflage(@PathVariable Long id, @RequestHeader("Authorization") String token) {
+        try {
+            String username = tokenService.validateToken(token.replace("Bearer ", ""));
+            userService.markCamouflageAsAchieved(username, id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return new ResponseEntity<>("Erro ao marcar camuflagem", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/me/camouflages/{id}/unmark")
+    public ResponseEntity<?> unmarkCamouflage(@PathVariable Long id, @RequestHeader("Authorization") String token) {
+        try {
+            String username = tokenService.validateToken(token.replace("Bearer ", ""));
+            userService.unmarkCamouflage(username, id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return new ResponseEntity<>("Erro ao desmarcar camuflagem", HttpStatus.BAD_REQUEST);
         }
     }
 }

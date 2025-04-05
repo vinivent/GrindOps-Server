@@ -19,6 +19,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final CamouflageRepository camouflageRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+
     @Autowired
     public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, CamouflageRepository camouflageRepository) {
         this.userRepository = userRepository;
@@ -31,7 +32,7 @@ public class UserService {
         Camouflage camo = camouflageRepository.findById(camouflageId)
                 .orElseThrow(() -> new EntityNotFoundException("Camuflagem não encontrada"));
 
-        if (camo.getUser() == null || !camo.getUser().getId().equals(user.getId())) {
+        if (camo.getUser() == null || camo.getUser().getId() != user.getId()) {
             // Clona a camuflagem para o usuário se ainda não for dele
             Camouflage newCamo = new Camouflage();
             newCamo.setName(camo.getName());
@@ -51,7 +52,7 @@ public class UserService {
         Camouflage camo = camouflageRepository.findById(camouflageId)
                 .orElseThrow(() -> new EntityNotFoundException("Camuflagem não encontrada"));
 
-        if (camo.getUser() != null && camo.getUser().getId().equals(user.getId())) {
+        if (camo.getUser() != null && camo.getUser().getId() == user.getId()) {
             camo.setAchieved(false);
             camouflageRepository.save(camo);
         } else {
@@ -59,15 +60,13 @@ public class UserService {
         }
     }
 
-
-    // CRUD
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
     public User getUserById(Long id) {
-        return userRepository.findById(id).
-                orElseThrow(() -> new EntityNotFoundException("Usário não encontrado com o ID: " + id));
+        return userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com o ID: " + id));
     }
 
     public User updateUser(User user) {
@@ -80,8 +79,8 @@ public class UserService {
         }
 
         return userRepository.save(user);
-
     }
+
     public void deleteUser(Long id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
@@ -90,14 +89,12 @@ public class UserService {
         }
     }
 
-    // Métodos adicionais
 
     public User getUserByUsername(String username) {
         return userRepository.findUserByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
     }
 
-    // Obter conquistas de um usuário pelo username
     public List<Achievement> getAchievementsByUsername(String username) {
         UserDetails userDetails = userRepository.findByUsername(username);
 
