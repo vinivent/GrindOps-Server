@@ -3,6 +3,7 @@ package com.devent.cprogress.service;
 import com.devent.cprogress.model.Achievement;
 import com.devent.cprogress.model.Camouflage;
 import com.devent.cprogress.model.User.User;
+import com.devent.cprogress.repository.CamouflageRepository;
 import com.devent.cprogress.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +17,48 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final CamouflageRepository camouflageRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     @Autowired
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, CamouflageRepository camouflageRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.camouflageRepository = camouflageRepository;
     }
+
+    public void markCamouflageAsAchieved(String username, Long camouflageId) {
+        User user = getUserByUsername(username);
+        Camouflage camo = camouflageRepository.findById(camouflageId)
+                .orElseThrow(() -> new EntityNotFoundException("Camuflagem não encontrada"));
+
+        if (camo.getUser() == null || !camo.getUser().getId().equals(user.getId())) {
+            // Clona a camuflagem para o usuário se ainda não for dele
+            Camouflage newCamo = new Camouflage();
+            newCamo.setName(camo.getName());
+            newCamo.setDescription(camo.getDescription());
+            newCamo.setCategory(camo.getCategory());
+            newCamo.setAchieved(true);
+            newCamo.setUser(user);
+            camouflageRepository.save(newCamo);
+        } else {
+            camo.setAchieved(true);
+            camouflageRepository.save(camo);
+        }
+    }
+
+    public void unmarkCamouflage(String username, Long camouflageId) {
+        User user = getUserByUsername(username);
+        Camouflage camo = camouflageRepository.findById(camouflageId)
+                .orElseThrow(() -> new EntityNotFoundException("Camuflagem não encontrada"));
+
+        if (camo.getUser() != null && camo.getUser().getId().equals(user.getId())) {
+            camo.setAchieved(false);
+            camouflageRepository.save(camo);
+        } else {
+            throw new EntityNotFoundException("Camuflagem não pertence ao usuário");
+        }
+    }
+
 
     // CRUD
     public List<User> getAllUsers() {

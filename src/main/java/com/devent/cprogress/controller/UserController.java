@@ -46,6 +46,22 @@ public class UserController {
         }
     }
 
+    @PostMapping("/me/camouflages/{id}/mark")
+    public ResponseEntity<?> markCamouflage(@PathVariable Long id, @RequestHeader("Authorization") String token) {
+        String username = tokenService.validateToken(token.replace("Bearer ", ""));
+        userService.markCamouflageAsAchieved(username, id);
+        return ResponseEntity.ok().build();
+    }
+
+
+    @DeleteMapping("/me/camouflages/{id}/unmark")
+    public ResponseEntity<?> unmarkCamouflage(@PathVariable Long id, @RequestHeader("Authorization") String token) {
+        String username = tokenService.validateToken(token.replace("Bearer ", ""));
+        userService.unmarkCamouflage(username, id);
+        return ResponseEntity.ok().build();
+    }
+
+
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         try {
